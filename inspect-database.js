@@ -1,14 +1,20 @@
-const { getDb, closeConnection } = require("./database");
+
+require("dotenv").config();
+const { MongoClient } = require("mongodb");
 
 async function main() {
+  const client = new MongoClient(process.env.MONGODB_URI);
+
   try {
-    const db = await getDb();
+    await client.connect();
+    const db = client.db("TPI_Vinoteca");
 
     for (const nombre of [
       "usuarios",
       "clientes",
       "categorias",
-      "productos"
+      "productos",
+      "ventas"
     ]) {
       const coleccion = db.collection(nombre);
       const cantidad = await coleccion.countDocuments();
@@ -24,7 +30,7 @@ async function main() {
     console.error("Error:", error.message);
     process.exitCode = 1;
   } finally {
-    await closeConnection();
+    await client.close();
   }
 }
 

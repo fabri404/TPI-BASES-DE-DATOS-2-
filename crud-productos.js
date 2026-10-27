@@ -1,13 +1,22 @@
-const { ObjectId } = require("mongodb");
+
+require("dotenv").config();
+const { MongoClient, ObjectId } = require("mongodb");
 const readline = require("node:readline/promises");
 const { stdin: input, stdout: output } = require("node:process");
-const { getDb, closeConnection } = require("./database");
 
 const rl = readline.createInterface({ input, output });
 
 async function main() {
+  if (!process.env.MONGODB_URI) {
+    throw new Error("Falta MONGODB_URI en .env");
+  }
+
+  const client = new MongoClient(process.env.MONGODB_URI);
+
   try {
-    const db = await getDb();
+    await client.connect();
+
+    const db = client.db("TPI_Vinoteca");
     const productos = db.collection("productos");
 
     let salir = false;
@@ -193,7 +202,7 @@ async function main() {
       }
     }
   } finally {
-    await closeConnection();
+    await client.close();
     rl.close();
   }
 }
