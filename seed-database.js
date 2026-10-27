@@ -1,18 +1,8 @@
-
-require("dotenv").config();
-const { MongoClient, ObjectId } = require("mongodb");
+const { getDb, closeConnection } = require("./database");
 
 async function main() {
-  if (!process.env.MONGODB_URI) {
-    throw new Error("Falta MONGODB_URI en el archivo .env");
-  }
-
-  const client = new MongoClient(process.env.MONGODB_URI);
-
   try {
-    await client.connect();
-
-    const db = client.db("TPI_Vinoteca");
+    const db = await getDb();
 
     const usuarios = db.collection("usuarios");
     const clientes = db.collection("clientes");
@@ -170,7 +160,7 @@ async function main() {
     console.error("Error durante la carga:", error.message);
     process.exitCode = 1;
   } finally {
-    await client.close();
+    await closeConnection();
   }
 }
 

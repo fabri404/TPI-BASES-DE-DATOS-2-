@@ -1,14 +1,8 @@
-
-require("dotenv").config();
-const { MongoClient } = require("mongodb");
+const { getDb, closeConnection } = require("./database");
 
 async function main() {
-  const client = new MongoClient(process.env.MONGODB_URI);
-
   try {
-    await client.connect();
-
-    const db = client.db("TPI_Vinoteca");
+    const db = await getDb();
 
     const productos = await db.collection("productos")
       .aggregate([
@@ -52,7 +46,7 @@ async function main() {
     console.error("Error:", error.message);
     process.exitCode = 1;
   } finally {
-    await client.close();
+    await closeConnection();
   }
 }
 

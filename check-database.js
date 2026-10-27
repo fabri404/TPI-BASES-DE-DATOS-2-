@@ -1,16 +1,11 @@
-require("dotenv").config();
-const { MongoClient } = require("mongodb");
+const { DB_NAME, getDb, closeConnection } = require("./database");
 
 async function main() {
-  const client = new MongoClient(process.env.MONGODB_URI);
-
   try {
-    await client.connect();
-
-    const db = client.db("TPI_Vinoteca");
+    const db = await getDb();
     const colecciones = await db.listCollections().toArray();
 
-    console.log("Base de datos: TPI_Vinoteca");
+    console.log("Base de datos:", DB_NAME);
     console.log("Colecciones:");
 
     colecciones.forEach(c => console.log(`- ${c.name}`));
@@ -19,7 +14,7 @@ async function main() {
     console.error("Error:", error.message);
     process.exitCode = 1;
   } finally {
-    await client.close();
+    await closeConnection();
   }
 }
 
